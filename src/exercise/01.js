@@ -3,22 +3,33 @@
 
 import * as React from 'react'
 
+const countReducer = (state, action) => {
+  const {count} = state
+  const {type, step} = action
+
+  switch (type) {
+    case 'INCREMENT': {
+      return {...state, count: count + step}
+    }
+    default: {
+      throw new Error(`Unsupported action type: ${type}`)
+    }
+  }
+}
+
 function Counter({initialCount = 0, step = 1}) {
-  // The 1st argument is called "state" - the current value of count
-  // The 2nd argument is called "newState" - the value passed to setCount
-  const [state, setState] = React.useReducer(
-    (state, action) => ({
-      ...state,
-      ...(typeof action === 'function' ? action(state) : action),
-    }),
-    {count: initialCount},
-  )
+  /**
+   * `useReducer` returns an array with exactly two values:
+   * - The current state. During the first render, it’s set to init(initialArg) or initialArg (if there’s no init).
+   * - The dispatch function that lets you update the state to a different value and trigger a re-render.
+   */
+  const [state, dispatch] = React.useReducer(countReducer, {
+    count: initialCount,
+  })
 
   const {count} = state
 
-  const increment = () =>
-    // setState accepts a function that receives the current state and returns a new state
-    setState(currentState => ({count: currentState.count + step}))
+  const increment = () => dispatch({type: 'INCREMENT', step})
 
   return <button onClick={increment}>{count}</button>
 }
